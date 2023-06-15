@@ -7,7 +7,7 @@ const { PORT = 3001 } = process.env;
 const server = express();
 
 server.use("/users", usersRoutes);
-server.use("/clothingItems", itemsRoutes);
+server.use("/items", itemsRoutes);
 
 server.listen(PORT, () => {
   console.log("Everything works fine");
