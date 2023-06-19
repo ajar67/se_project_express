@@ -3,6 +3,11 @@ const clothingItem = require("../models/clothingItem");
 const getItems = (res) => {
   clothingItem
     .find({})
+    .orFail(() => {
+      const error = new Error("Item not found");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((items) => {
       res.send({ data: items });
     })
@@ -12,6 +17,7 @@ const getItems = (res) => {
 };
 
 const createItem = (req, res) => {
+  console.log(req.user._id);
   const { name, weather, image } = req.body;
   clothingItem
     .create({ name, weather, image })
@@ -27,6 +33,11 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   clothingItem
     .deleteOne(itemId)
+    .orFail(() => {
+      const error = new Error("Item ID not found");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((item) => {
       res.send({ data: item });
     })
@@ -35,4 +46,46 @@ const deleteItem = (req, res) => {
     });
 };
 
-module.exports = { getItems, createItem, deleteItem };
+const likeItem = (req, res) => {
+  const { itemId } = req.params;
+  clothingItem
+    .findByIdAndUpdate(
+      itemId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true }
+    )
+    .orFail(() => {
+      const error = new Error("Item ID not found");
+      error.statusCode = 404;
+      throw error;
+    })
+    .then((item) => {
+      res.send({ data: item });
+    })
+    .catch(() => {
+      res.status(500).send({ message: "Requested resource not found" });
+    });
+};
+
+const dislikeItem = (req, res) => {
+  const { itemId } = req.params;
+  clothingItem
+    .findByIdAndUpdate(
+      itemId,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    )
+    .orFail(() => {
+      const error = new Error("Item ID not found");
+      error.statusCode = 404;
+      throw error;
+    })
+    .then((item) => {
+      res.send({ data: item });
+    })
+    .catch(() => {
+      res.status(500).send({ message: "Requested resource not found" });
+    });
+};
+
+module.exports = { getItems, createItem, deleteItem, likeItem, dislikeItem };

@@ -2,6 +2,11 @@ const User = require("../models/user");
 
 const getUsers = (res) => {
   User.find({})
+    .orFail(() => {
+      const error = new Error("User not found");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((users) => {
       res.send({ data: users });
     })
@@ -13,6 +18,11 @@ const getUsers = (res) => {
 const getUser = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
+    .orFail(() => {
+      const error = new Error("User ID not found");
+      error.statusCode = 404;
+      throw error;
+    })
     .then((user) => {
       res.send({ data: user });
     })

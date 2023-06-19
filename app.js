@@ -13,7 +13,7 @@ server.use("/items", itemsRoutes);
 
 server.use((req, res, next) => {
   req.user = {
-    _id: "1234455",
+    _id: "649077f3e408853941f3b007",
   };
   next();
 });
