@@ -9,6 +9,13 @@ const server = express();
 server.use("/users", usersRoutes);
 server.use("/items", itemsRoutes);
 
+server.use((req, res, next) => {
+  req.user = {
+    _id: '1234455',
+  };
+  next();
+});
+
 server.listen(PORT, () => {
   console.log("Everything works fine");
 });
