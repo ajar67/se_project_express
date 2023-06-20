@@ -1,6 +1,6 @@
 const clothingItem = require("../models/clothingItem");
 
-const getItems = (res) => {
+const getItems = (req, res) => {
   clothingItem
     .find({})
     .orFail(() => {
@@ -42,7 +42,7 @@ const deleteItem = (req, res) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res.status(404).send({ message: "Requested resource not found" });
     });
 };
 
@@ -63,7 +63,7 @@ const likeItem = (req, res) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res.status(404).send({ message: "Requested resource not found" });
     });
 };
 
@@ -84,7 +84,7 @@ const dislikeItem = (req, res) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res.status(404).send({ message: "Requested resource not found" });
     });
 };
 

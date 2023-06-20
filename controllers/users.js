@@ -1,6 +1,6 @@
 const User = require("../models/user");
 
-const getUsers = (res) => {
+const getUsers = (req, res) => {
   User.find({})
     .orFail(() => {
       const error = new Error("User not found");
