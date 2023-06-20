@@ -1,17 +1,25 @@
 const User = require("../models/user");
 
+const {
+  INTERNAL_SERVER_ERROR,
+  INVALID_DATA_ERROR,
+  NO_DATA_WITH_ID_ERROR,
+} = require("../utils/errors");
+
 const getUsers = (req, res) => {
   User.find({})
     .orFail(() => {
       const error = new Error("User not found");
-      error.statusCode = 404;
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((users) => {
       res.send({ data: users });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
@@ -20,25 +28,34 @@ const getUser = (req, res) => {
   User.findById(userId)
     .orFail(() => {
       const error = new Error("User ID not found");
-      error.statusCode = 404;
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((user) => {
       res.send({ data: user });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
   User.create({ name, avatar })
+    .orFail(() => {
+      const error = new Error("Invalid data!");
+      error.statusCode = INVALID_DATA_ERROR;
+      throw error;
+    })
     .then((user) => {
       res.send({ data: user });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 

@@ -1,18 +1,26 @@
 const clothingItem = require("../models/clothingItem");
 
+const {
+  INTERNAL_SERVER_ERROR,
+  INVALID_DATA_ERROR,
+  NO_DATA_WITH_ID_ERROR,
+} = require("../utils/errors");
+
 const getItems = (req, res) => {
   clothingItem
     .find({})
     .orFail(() => {
       const error = new Error("Item not found");
-      error.statusCode = 404;
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((items) => {
       res.send({ data: items });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
@@ -21,11 +29,18 @@ const createItem = (req, res) => {
   const { name, weather, image } = req.body;
   clothingItem
     .create({ name, weather, image })
+    .orFail(() => {
+      const error = new Error("Invalid data!");
+      error.statusCode = INVALID_DATA_ERROR;
+      throw error;
+    })
     .then((item) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(500).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
@@ -35,14 +50,16 @@ const deleteItem = (req, res) => {
     .deleteOne(itemId)
     .orFail(() => {
       const error = new Error("Item ID not found");
-      error.statusCode = 404;
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((item) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(404).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
@@ -56,14 +73,16 @@ const likeItem = (req, res) => {
     )
     .orFail(() => {
       const error = new Error("Item ID not found");
-      error.statusCode = 404;
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((item) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(404).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
@@ -77,14 +96,16 @@ const dislikeItem = (req, res) => {
     )
     .orFail(() => {
       const error = new Error("Item ID not found");
-      error.statusCode = 404;
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((item) => {
       res.send({ data: item });
     })
     .catch(() => {
-      res.status(404).send({ message: "Requested resource not found" });
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "Requested resource not found" });
     });
 };
 
