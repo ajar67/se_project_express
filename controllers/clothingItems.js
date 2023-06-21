@@ -16,7 +16,8 @@ const getItems = (req, res) => {
     .then((items) => {
       res.send({ data: items });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
@@ -25,13 +26,14 @@ const getItems = (req, res) => {
 
 const createItem = (req, res) => {
   console.log(req.user._id);
-  const { name, weather, image } = req.body;
+  const { name, weather, imageUrl } = req.body;
   clothingItem
-    .create({ name, weather, image })
+    .create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.send({ data: item });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
@@ -50,7 +52,8 @@ const deleteItem = (req, res) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
@@ -73,7 +76,8 @@ const likeItem = (req, res) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
@@ -96,7 +100,8 @@ const dislikeItem = (req, res) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });

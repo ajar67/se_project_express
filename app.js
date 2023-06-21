@@ -8,15 +8,15 @@ const server = express();
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 server.use(express.json());
 
-server.use("/users", usersRoutes);
-server.use("/items", itemsRoutes);
-
 server.use((req, res, next) => {
   req.user = {
     _id: "649077f3e408853941f3b007",
   };
   next();
 });
+
+server.use("/users", usersRoutes);
+server.use("/items", itemsRoutes);
 
 server.listen(PORT, () => {
   console.log("Everything works fine");
