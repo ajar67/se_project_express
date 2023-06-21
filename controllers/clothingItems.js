@@ -29,11 +29,6 @@ const createItem = (req, res) => {
   const { name, weather, image } = req.body;
   clothingItem
     .create({ name, weather, image })
-    .orFail(() => {
-      const error = new Error("Invalid data!");
-      error.statusCode = INVALID_DATA_ERROR;
-      throw error;
-    })
     .then((item) => {
       res.send({ data: item });
     })

@@ -44,11 +44,6 @@ const getUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
   User.create({ name, avatar })
-    .orFail(() => {
-      const error = new Error("Invalid data!");
-      error.statusCode = INVALID_DATA_ERROR;
-      throw error;
-    })
     .then((user) => {
       res.send({ data: user });
     })
