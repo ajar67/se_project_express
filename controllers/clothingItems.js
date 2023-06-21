@@ -2,7 +2,6 @@ const clothingItem = require("../models/clothingItem");
 
 const {
   INTERNAL_SERVER_ERROR,
-  INVALID_DATA_ERROR,
   NO_DATA_WITH_ID_ERROR,
 } = require("../utils/errors");
 

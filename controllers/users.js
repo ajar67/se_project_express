@@ -2,7 +2,6 @@ const User = require("../models/user");
 
 const {
   INTERNAL_SERVER_ERROR,
-  INVALID_DATA_ERROR,
   NO_DATA_WITH_ID_ERROR,
 } = require("../utils/errors");
 
