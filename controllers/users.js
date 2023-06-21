@@ -16,7 +16,7 @@ const getUsers = (req, res) => {
       res.send({ data: users });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
@@ -35,7 +35,7 @@ const getUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
@@ -49,7 +49,7 @@ const createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Requested resource not found" });
