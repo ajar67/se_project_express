@@ -6,6 +6,6 @@ const { getUser, getUsers, createUser } = require("../controllers/users");
 
 router.get("/:userId", getUser);
 router.get("/", getUsers);
-router.post("/", createUser); // use req.body??
+router.post("/", createUser); 
 
 module.exports = router;
