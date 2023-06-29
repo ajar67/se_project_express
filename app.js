@@ -23,13 +23,13 @@ server.use("/users", usersRoutes);
 server.use("/items", itemsRoutes);
 
 server.use((req, res) => {
-  return res
+  res
     .status(NO_DATA_WITH_ID_ERROR)
-    .send({ message: "Route" + req.url + " Not found." });
+    .send({ message: `Route ${req.url} not found!` });
 });
 
 server.use((err, req, res) => {
-  return res.status(INTERNAL_SERVER_ERROR).send({ error: err });
+  res.status(INTERNAL_SERVER_ERROR).send({ message: err });
 });
 
 server.listen(PORT, () => {
