@@ -1,5 +1,4 @@
 const User = require("../models/user");
-const validator = require("validator");
 
 const {
   INTERNAL_SERVER_ERROR,
@@ -21,15 +20,12 @@ const getUsers = (req, res) => {
       console.log(err);
       console.log(err.message);
       console.log(err.name);
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
-      }
-      if (err.name === "Error") {
+      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
           .send({ message: "Id is not in database!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
@@ -51,14 +47,14 @@ const getUser = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
-      if (err.name === "Error") {
+      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
           .send({ message: "Id is not in database!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
@@ -66,16 +62,6 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
-  if (name.length < 2 || name.length > 30 || !name || !avatar) {
-    return res.status(INVALID_DATA_ERROR).send({
-      message: "Invalid data!",
-    });
-  }
-  if (!validator.isURL(avatar)) {
-    return res
-      .status(INVALID_DATA_ERROR)
-      .send({ message: "Error: Invalid url!" });
-  }
   User.create({ name, avatar })
     .then((user) => {
       res.status(200).send({ data: user });
@@ -84,15 +70,12 @@ const createUser = (req, res) => {
       console.log(err);
       console.log(err.message);
       console.log(err.name);
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
-      }
-      if (err.name === "Error") {
+      if (err.name === "ValidationError") {
         return res
-          .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "Invalid data!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });

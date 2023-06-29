@@ -1,5 +1,4 @@
 const clothingItem = require("../models/clothingItem");
-const validator = require("validator");
 
 const {
   INTERNAL_SERVER_ERROR,
@@ -10,11 +9,7 @@ const {
 const getItems = (req, res) => {
   clothingItem
     .find({})
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NO_DATA_WITH_ID_ERROR;
-      throw error;
-    })
+    .orFail()
     .then((items) => {
       res.status(200).send({ data: items });
     })
@@ -22,15 +17,12 @@ const getItems = (req, res) => {
       console.log(err);
       console.log(err.message);
       console.log(err.name);
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
-      }
-      if (err.name === "Error") {
+      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
           .send({ message: "Id is not in database!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
@@ -39,17 +31,6 @@ const getItems = (req, res) => {
 const createItem = (req, res) => {
   console.log(req.user._id);
   const { name, weather, imageUrl } = req.body;
-  if (name.length < 2 || name.length > 30 || !weather) {
-    return res.status(INVALID_DATA_ERROR).send({
-      message: "Invalid data!",
-    });
-  }
-
-  if (!validator.isURL(imageUrl)) {
-    return res
-      .status(INVALID_DATA_ERROR)
-      .send({ message: "Error: Invalid url!" });
-  }
 
   clothingItem
     .create({ name, weather, imageUrl, owner: req.user._id })
@@ -61,14 +42,14 @@ const createItem = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
-      if (err.name === "Error") {
+      if (err.name === "ValidationError") {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
+          .send({ message: "Invalid data!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
@@ -91,14 +72,14 @@ const deleteItem = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
-      if (err.name === "Error") {
+      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
           .send({ message: "Id is not in database!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
@@ -127,12 +108,12 @@ const likeItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Invalid Id!" });
       }
-      if (err.name === "Error") {
+      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
           .send({ message: "Id is not in database!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
@@ -161,12 +142,12 @@ const dislikeItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Invalid Id!" });
       }
-      if (err.name === "Error") {
+      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
           .send({ message: "Id is not in database!" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
