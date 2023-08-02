@@ -20,7 +20,10 @@
   },
   "homepage": "https://github.com/ajar67/se_project_express#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
+    "express-jwt": "^8.4.1",
     "mongoose": "^6.6.1",
     "valid-url": "^1.0.9",
     "validator": "^13.9.0"

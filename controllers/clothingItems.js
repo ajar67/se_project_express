@@ -20,11 +20,11 @@ const getItems = (req, res) => {
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
+          .send({ error: "Id is not in database!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
+        .send({ error: "An error occured on the server!" });
     });
 };
 
@@ -42,21 +42,20 @@ const createItem = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ error: "Invalid Id!" });
       }
       if (err.name === "ValidationError") {
-        return res
-          .status(INVALID_DATA_ERROR)
-          .send({ message: "Invalid data!" });
+        return res.status(INVALID_DATA_ERROR).send({ error: "Invalid data!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
+        .send({ error: "An error occured on the server!" });
     });
 };
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const ownerItemId = req.body.owner;
   clothingItem
     .findByIdAndRemove(itemId)
     .orFail(() => {
@@ -65,23 +64,27 @@ const deleteItem = (req, res) => {
       throw error;
     })
     .then((item) => {
-      res.status(200).send({ data: item });
+      if (ownerItemId !== req.loggedInUser._id) {
+        res.status(403).send({ error: "You are not the owner of this item!" });
+      } else {
+        res.status(200).send({ data: item });
+      }
     })
     .catch((err) => {
       console.log(err);
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ error: "Invalid Id!" });
       }
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
+          .send({ error: "Id is not in database!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
+        .send({ error: "An error occured on the server!" });
     });
 };
 
@@ -106,16 +109,16 @@ const likeItem = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(400).send({ error: "Invalid Id!" });
       }
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
+          .send({ error: "Id is not in database!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
+        .send({ error: "An error occured on the server!" });
     });
 };
 
@@ -140,16 +143,16 @@ const dislikeItem = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(400).send({ error: "Invalid Id!" });
       }
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
+          .send({ error: "Id is not in database!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
+        .send({ error: "An error occured on the server!" });
     });
 };
 
