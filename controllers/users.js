@@ -27,11 +27,11 @@ const getUsers = (req, res) => {
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ error: "Id is not in database!" });
+          .send({ message: "Id is not in database!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ error: "An error occured on the server!" });
+        .send({ message: "An error occured on the server!" });
     });
 };
 
@@ -51,16 +51,16 @@ const getUser = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(INVALID_DATA_ERROR).send({ error: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res
           .status(NO_DATA_WITH_ID_ERROR)
-          .send({ error: "Id is not in database!" });
+          .send({ message: "Id is not in database!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ error: "An error occured on the server!" });
+        .send({ message: "An error occured on the server!" });
     });
 };
 
@@ -69,7 +69,7 @@ const createUser = (req, res) => {
   bcrypt
     .hash(password, 10)
     .then((hash) => {
-      User.create({ name, avatar, email, hash });
+      User.create({ name, avatar, email, password: hash });
     })
     .then((user) => {
       if (user.email === email) {
@@ -83,12 +83,14 @@ const createUser = (req, res) => {
       console.log(err);
       console.log(err.message);
       console.log(err.name);
-      if (err.name === "ValidationError") {
-        return res.status(INVALID_DATA_ERROR).send({ error: "Invalid data!" });
+      if (err.name === "ValidationError" || err.name === "TypeError") {
+        return res
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "Invalid data!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ error: "An error occured on the server!" });
+        .send({ message: "An error occured on the server!" });
     });
 };
 
@@ -102,7 +104,7 @@ const login = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(INVALID_AUTHENTICATION).send({ error: err.message });
+      res.status(INVALID_AUTHENTICATION).send({ message: err.message });
     });
 };
 
@@ -119,11 +121,11 @@ const getCurrentUser = (req, res) => {
         if (err.name === "ValidationError") {
           return res
             .status(INVALID_DATA_ERROR)
-            .send({ error: "Invalid data!" });
+            .send({ message: "Invalid data!" });
         }
         return res
           .status(INTERNAL_SERVER_ERROR)
-          .send({ error: "An error occured on the server!" });
+          .send({ message: "An error occured on the server!" });
       });
   });
 };
@@ -139,11 +141,13 @@ const updateProfile = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "ValidationError") {
-        return res.status(INVALID_DATA_ERROR).send({ error: "Invalid data!" });
+        return res
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "Invalid data!" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ error: "An error occured on the server!" });
+        .send({ message: "An error occured on the server!" });
     });
 };
 
