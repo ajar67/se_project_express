@@ -66,18 +66,15 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  bcrypt
+  const existingEmail = User.findOne({email});
+  if(!existingEmail){
+    bcrypt
     .hash(password, 10)
     .then((hash) => {
-      User.create({ name, avatar, email, password: hash });
+      User.create({ name: name, avatar: avatar, email: email, password: hash });
     })
     .then((user) => {
-      if (user.email === email) {
-        const error = new Error("Email already exists!");
-        error.statusCode = DUPLICATE_ERROR;
-        throw error;
-      }
-      res.status(200).send({ data: user });
+      res.status(201).send({ data: user });
     })
     .catch((err) => {
       console.log(err);
@@ -92,6 +89,9 @@ const createUser = (req, res) => {
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
     });
+  } else {
+    return res.status(DUPLICATE_ERROR).send({message: "Email already exists!"});
+  }
 };
 
 const login = (req, res) => {
