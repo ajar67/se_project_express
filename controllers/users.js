@@ -104,23 +104,18 @@ const createUser = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
-    .select("+password")
     .then((user) => {
       res.status(200).send({
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
       });
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.name);
-      consolelog(err.message);
-      res.status(INVALID_AUTHENTICATION).send({ message: err.message });
+      res.status(INVALID_AUTHENTICATION).send({ message: 'Invalid Credentials!' });
     });
 };
 
 const getCurrentUser = (req, res) => {
   const currentUser = req.user;
-  console.log(currentUser);
   User.find({ currentUser }).then((result) => {
     res
       .status(200)
