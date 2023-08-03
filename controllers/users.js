@@ -66,31 +66,38 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  const existingEmail = User.findOne({email});
-  if(!existingEmail){
+  const existingEmail = User.findOne({ email });
+  if (!existingEmail) {
     bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      User.create({ name: name, avatar: avatar, email: email, password: hash });
-    })
-    .then((user) => {
-      res.status(201).send({ data: user });
-    })
-    .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
-      if (err.name === "ValidationError" || err.name === "TypeError") {
+      .hash(password, 10)
+      .then((hash) => {
+        User.create({
+          name: name,
+          avatar: avatar,
+          email: email,
+          password: hash,
+        });
+      })
+      .then((user) => {
+        res.status(201).send({ data: user });
+      })
+      .catch((err) => {
+        console.log(err);
+        console.log(err.message);
+        console.log(err.name);
+        if (err.name === "ValidationError" || err.name === "TypeError") {
+          return res
+            .status(INVALID_DATA_ERROR)
+            .send({ message: "Invalid data!" });
+        }
         return res
-          .status(INVALID_DATA_ERROR)
-          .send({ message: "Invalid data!" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
-    });
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "An error occured on the server!" });
+      });
   } else {
-    return res.status(DUPLICATE_ERROR).send({message: "Email already exists!"});
+    return res
+      .status(DUPLICATE_ERROR)
+      .send({ message: "Email already exists!" });
   }
 };
 
@@ -109,11 +116,12 @@ const login = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { _id } = req.user;
-  User.find((user) => user._id === _id).then((result) => {
+  const currentUser = req.user;
+  console.log(currentUser);
+  User.find(currentUser).then((result) => {
     res
       .status(200)
-      .send({ result })
+      .send({ data: result })
       .catch((err) => {
         console.log(err);
         console.log(err.message);
