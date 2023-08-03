@@ -36,4 +36,23 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.statics.findUserByCredentials = function findUserByCredentials(
+  email,
+  password
+) {
+  return this.findOne({ email }).then((user) => {
+    if (!user) {
+      throw new Error('Incorrect email or password');
+    }
+
+    return bcrypt.compare(password, user.password).then((matched) => {
+      if (!matched) {
+        throw new Error('Incorrect email or password');
+      }
+
+      return user;
+    }).catch((err)=> console.log(err.name));
+  }).catch((err)=> console.log(err.name));
+};
+
 module.exports = mongoose.model("user", userSchema);

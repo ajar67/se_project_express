@@ -103,7 +103,7 @@ const createUser = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  User.findUserByCredentials({ email, password })
+  User.findUserByCredentials(email, password)
     .select("+password")
     .then((user) => {
       res.status(200).send({
@@ -111,6 +111,9 @@ const login = (req, res) => {
       });
     })
     .catch((err) => {
+      console.log(err);
+      console.log(err.name);
+      consolelog(err.message);
       res.status(INVALID_AUTHENTICATION).send({ message: err.message });
     });
 };
@@ -118,7 +121,7 @@ const login = (req, res) => {
 const getCurrentUser = (req, res) => {
   const currentUser = req.user;
   console.log(currentUser);
-  User.find({currentUser}).then((result) => {
+  User.find({ currentUser }).then((result) => {
     res
       .status(200)
       .send({ data: result })
