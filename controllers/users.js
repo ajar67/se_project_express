@@ -118,7 +118,7 @@ const login = (req, res) => {
 const getCurrentUser = (req, res) => {
   const currentUser = req.user;
   console.log(currentUser);
-  User.find(currentUser).then((result) => {
+  User.find({currentUser}).then((result) => {
     res
       .status(200)
       .send({ data: result })
