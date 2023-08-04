@@ -66,39 +66,50 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  User.findOne({ email }).then((user) => {
-    if (user) {
-      const error = new Error("Email already exists!");
-      error.statusCode = DUPLICATE_ERROR;
-      throw error;
-    }
-    bcrypt
-      .hash(password, 10)
-      .then((hash) => {
-        User.create({
-          name: name,
-          avatar: avatar,
-          email: email,
-          password: hash,
-        });
-      })
-      .then((user) => {
-        res.status(201).send({ data: user });
-      })
-      .catch((err) => {
-        console.log(err);
-        console.log(err.message);
-        console.log(err.name);
-        if (err.name === "ValidationError" || err.name === "TypeError") {
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        const error = new Error("Email already exists!");
+        error.statusCode = DUPLICATE_ERROR;
+        throw error;
+      }
+      bcrypt
+        .hash(password, 10)
+        .then((hash) => {
+          User.create({
+            name: name,
+            avatar: avatar,
+            email: email,
+            password: hash,
+          });
+        })
+        .then((user) => {
+          res.status(201).send({ data: user });
+        })
+        .catch((err) => {
+          console.log(err);
+          console.log(err.message);
+          console.log(err.name);
+          if (err.name === "ValidationError" || err.name === "TypeError") {
+            return res
+              .status(INVALID_DATA_ERROR)
+              .send({ message: "Invalid data!" });
+          }
           return res
-            .status(INVALID_DATA_ERROR)
-            .send({ message: "Invalid data!" });
-        }
+            .status(INTERNAL_SERVER_ERROR)
+            .send({ message: "An error occured on the server!" });
+        });
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError" || err.name === "TypeError") {
         return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: "An error occured on the server!" });
-      });
-  });
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "Invalid data!" });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error occured on the server!" });
+    });
 };
 
 const login = (req, res) => {
