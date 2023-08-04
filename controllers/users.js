@@ -66,8 +66,12 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  const existingEmail = User.findOne({ email });
-  if (!existingEmail) {
+  User.findOne({ email }).then((user) => {
+    if (user) {
+      const error = new Error("Email already exists!");
+      error.statusCode = DUPLICATE_ERROR;
+      throw error;
+    }
     bcrypt
       .hash(password, 10)
       .then((hash) => {
@@ -94,11 +98,7 @@ const createUser = (req, res) => {
           .status(INTERNAL_SERVER_ERROR)
           .send({ message: "An error occured on the server!" });
       });
-  } else {
-    return res
-      .status(DUPLICATE_ERROR)
-      .send({ message: "Email already exists!" });
-  }
+  });
 };
 
 const login = (req, res) => {
@@ -110,7 +110,9 @@ const login = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(INVALID_AUTHENTICATION).send({ message: 'Invalid Credentials!' });
+      res
+        .status(INVALID_AUTHENTICATION)
+        .send({ message: "Invalid Credentials!" });
     });
 };
 
