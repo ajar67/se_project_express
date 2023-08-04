@@ -73,35 +73,24 @@ const createUser = (req, res) => {
         error.statusCode = DUPLICATE_ERROR;
         throw error;
       }
-      bcrypt
-        .hash(password, 10)
-        .then((hash) => {
-          User.create({
-            name: name,
-            avatar: avatar,
-            email: email,
-            password: hash,
-          });
-        })
-        .then((user) => {
-          res.status(201).send({ data: user });
-        })
-        .catch((err) => {
-          console.log(err);
-          console.log(err.message);
-          console.log(err.name);
-          if (err.name === "ValidationError" || err.name === "TypeError") {
-            return res
-              .status(INVALID_DATA_ERROR)
-              .send({ message: "Invalid data!" });
-          }
-          return res
-            .status(INTERNAL_SERVER_ERROR)
-            .send({ message: "An error occured on the server!" });
-        });
+      return bcrypt.hash(password, 10);
+    })
+    .then((hash) => {
+      User.create({
+        name: name,
+        avatar: avatar,
+        email: email,
+        password: hash,
+      });
+    })
+    .then((user) => {
+      res.status(201).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === "ValidationError" || err.name === "TypeError") {
+      console.log(err);
+      console.log(err.message);
+      console.log({ name: err.name });
+      if (err.name === "ValidationError" || err.name === "ValidatorError") {
         return res
           .status(INVALID_DATA_ERROR)
           .send({ message: "Invalid data!" });
