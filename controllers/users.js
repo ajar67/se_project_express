@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const jwt = require("express-jwt");
+const jwt = require("jsonwebtoken");
 const {
   INTERNAL_SERVER_ERROR,
   INVALID_DATA_ERROR,
@@ -69,14 +69,12 @@ const createUser = (req, res) => {
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        const error = new Error("Email already exists!");
-        error.statusCode = DUPLICATE_ERROR;
-        throw error;
+        throw new Error("Email already exists!");
       }
       return bcrypt.hash(password, 10);
     })
     .then((hash) => {
-      User.create({
+      return User.create({
         name: name,
         avatar: avatar,
         email: email,
@@ -85,11 +83,16 @@ const createUser = (req, res) => {
     })
     .then((user) => {
       res.status(201).send({ data: user });
+      console.log({ user });
+      console.log(user.password);
     })
     .catch((err) => {
       console.log(err);
       console.log(err.message);
       console.log({ name: err.name });
+      if (err.message === "Email already exists!") {
+        return res.status(DUPLICATE_ERROR).send({ message: err.message });
+      }
       if (err.name === "ValidationError" || err.name === "ValidatorError") {
         return res
           .status(INVALID_DATA_ERROR)
@@ -110,6 +113,7 @@ const login = (req, res) => {
       });
     })
     .catch((err) => {
+      console.error(err);
       res
         .status(INVALID_AUTHENTICATION)
         .send({ message: "Invalid Credentials!" });

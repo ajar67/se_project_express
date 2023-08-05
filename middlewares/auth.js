@@ -1,4 +1,4 @@
-const jwt = require("express-jwt");
+const jwt = require("jsonwebtoken");
 const { INVALID_AUTHENTICATION } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
