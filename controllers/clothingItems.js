@@ -4,12 +4,12 @@ const {
   INTERNAL_SERVER_ERROR,
   INVALID_DATA_ERROR,
   NO_DATA_WITH_ID_ERROR,
+  REFUSE_T0_AUTHORIZE_ERROR,
 } = require("../utils/errors");
 
 const getItems = (req, res) => {
   clothingItem
     .find({})
-    .orFail()
     .then((items) => {
       res.status(200).send({ data: items });
     })
@@ -17,11 +17,6 @@ const getItems = (req, res) => {
       console.log(err);
       console.log(err.message);
       console.log(err.name);
-      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
-        return res
-          .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
-      }
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occured on the server!" });
@@ -57,22 +52,22 @@ const createItem = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  const ownerItemId = req.body.owner;
   clothingItem
-    .findByIdAndRemove(itemId)
+    .findById(itemId)
     .orFail(() => {
       const error = new Error("Item ID not found");
       error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
     .then((item) => {
-      if (ownerItemId !== req.loggedInUser._id) {
+      if (!item.owner.equals(req.user._id)) {
         res
-          .status(403)
-          .send({ message: "You are not the owner of this item!" });
-      } else {
-        res.status(200).send({ data: item });
+          .status(REFUSE_T0_AUTHORIZE_ERROR)
+          .send({ message: "Access to this resource is forbidden." });
       }
+      return item
+        .deleteOne()
+        .then(() => res.status(200).send({ message: "Item was deleted!" }));
     })
     .catch((err) => {
       console.log(err);
@@ -113,7 +108,7 @@ const likeItem = (req, res) => {
       console.log(err.message);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res

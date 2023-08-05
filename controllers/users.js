@@ -10,65 +10,11 @@ const {
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
-const getUsers = (req, res) => {
-  User.find({})
-    .orFail(() => {
-      const error = new Error("User not found");
-      error.statusCode = NO_DATA_WITH_ID_ERROR;
-      throw error;
-    })
-    .then((users) => {
-      res.status(200).send({ data: users });
-    })
-    .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
-      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
-        return res
-          .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
-    });
-};
-
-const getUser = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
-    .orFail(() => {
-      const error = new Error("User ID not found");
-      error.statusCode = NO_DATA_WITH_ID_ERROR;
-      throw error;
-    })
-    .then((user) => {
-      res.status(200).send({ data: user });
-    })
-    .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
-      if (err.name === "CastError") {
-        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
-      }
-      if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
-        return res
-          .status(NO_DATA_WITH_ID_ERROR)
-          .send({ message: "Id is not in database!" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
-    });
-};
-
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   User.findOne({ email })
     .then((user) => {
-      if(!email){
+      if (!email) {
         throw new Error("Validation Error");
       }
       if (user) {
@@ -85,7 +31,9 @@ const createUser = (req, res) => {
       });
     })
     .then((user) => {
-      res.status(201).send({ data: user });
+      res
+        .status(201)
+        .send({ name: user.name, avatar: user.avatar, email: user.email });
       console.log({ user });
       console.log(user.password);
     })
@@ -96,7 +44,7 @@ const createUser = (req, res) => {
       if (err.message === "Email already exists!") {
         return res.status(DUPLICATE_ERROR).send({ message: err.message });
       }
-      if (err.name === 'ValidationError' || err.message === "Validation Error") {
+      if (err.name === "ValidationError") {
         return res
           .status(INVALID_DATA_ERROR)
           .send({ message: "Invalid data!" });
@@ -125,29 +73,44 @@ const login = (req, res) => {
 
 const getCurrentUser = (req, res) => {
   const currentUser = req.user;
-  User.find({ currentUser }).then((result) => {
-    return res
-      .status(200)
-      .send({ data: result })
-      .catch((err) => {
-        console.log(err);
-        console.log(err.message);
-        console.log(err.name);
-        if (err.name === "ValidationError") {
+  User.find({ currentUser })
+    .orFail(() => {
+      const error = new Error("User ID not found");
+      error.statusCode = NO_DATA_WITH_ID_ERROR;
+      throw error;
+    })
+    .then((result) => {
+      return res
+        .status(200)
+        .send({ data: result })
+        .catch((err) => {
+          console.log(err);
+          console.log(err.message);
+          console.log(err.name);
+          if (err.name === "CastError") {
+            return res
+              .status(INVALID_DATA_ERROR)
+              .send({ message: "Invalid data!" });
+          }
+          if (err.message === "User ID not found") {
+            return res
+              .status(NO_DATA_WITH_ID_ERROR)
+              .send({ message: err.message });
+          }
           return res
-            .status(INVALID_DATA_ERROR)
-            .send({ message: "Invalid data!" });
-        }
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: "An error occured on the server!" });
-      });
-  });
+            .status(INTERNAL_SERVER_ERROR)
+            .send({ message: "An error occured on the server!" });
+        });
+    });
 };
 
 const updateProfile = (req, res) => {
   const opts = { runValidators: true };
-  User.findOneAndUpdate({ new: true }, opts)
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { name: req.user.name, avatar: req.user.avatar },
+    { new: true, opts }
+  )
     .then((result) => {
       res.status(200).send({ result });
     })
@@ -167,8 +130,6 @@ const updateProfile = (req, res) => {
 };
 
 module.exports = {
-  getUsers,
-  getUser,
   createUser,
   login,
   getCurrentUser,
