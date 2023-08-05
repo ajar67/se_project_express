@@ -68,6 +68,9 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   User.findOne({ email })
     .then((user) => {
+      if(!email){
+        throw new Error("Validation Error");
+      }
       if (user) {
         throw new Error("Email already exists!");
       }
@@ -93,7 +96,7 @@ const createUser = (req, res) => {
       if (err.message === "Email already exists!") {
         return res.status(DUPLICATE_ERROR).send({ message: err.message });
       }
-      if (err.name === "ValidationError" || err.name === "ValidatorError") {
+      if (err.name === 'ValidationError' || err.message === "Validation Error") {
         return res
           .status(INVALID_DATA_ERROR)
           .send({ message: "Invalid data!" });
@@ -123,7 +126,7 @@ const login = (req, res) => {
 const getCurrentUser = (req, res) => {
   const currentUser = req.user;
   User.find({ currentUser }).then((result) => {
-    res
+    return res
       .status(200)
       .send({ data: result })
       .catch((err) => {
