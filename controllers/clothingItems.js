@@ -13,18 +13,12 @@ const getItems = (req, res) => {
     .then((items) => {
       res.status(200).send({ data: items });
     })
-    .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
-      return res
+    .catch(() => res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" });
-    });
+        .send({ message: "An error occured on the server!" }));
 };
 
 const createItem = (req, res) => {
-  console.log(req.user._id);
   const { name, weather, imageUrl } = req.body;
 
   clothingItem
@@ -33,9 +27,6 @@ const createItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
@@ -61,7 +52,7 @@ const deleteItem = (req, res) => {
     })
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        res
+        return res
           .status(REFUSE_T0_AUTHORIZE_ERROR)
           .send({ message: "Access to this resource is forbidden." });
       }
@@ -70,9 +61,6 @@ const deleteItem = (req, res) => {
         .then(() => res.status(200).send({ message: "Item was deleted!" }));
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
@@ -104,9 +92,6 @@ const likeItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
@@ -138,11 +123,8 @@ const dislikeItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid Id!" });
+        return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
       if (err.statusCode === NO_DATA_WITH_ID_ERROR) {
         return res

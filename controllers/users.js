@@ -1,6 +1,7 @@
-const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
 const {
   INTERNAL_SERVER_ERROR,
   INVALID_DATA_ERROR,
@@ -22,25 +23,18 @@ const createUser = (req, res) => {
       }
       return bcrypt.hash(password, 10);
     })
-    .then((hash) => {
-      return User.create({
-        name: name,
-        avatar: avatar,
-        email: email,
-        password: hash,
-      });
-    })
+    .then((hash) => User.create({
+        name,
+        avatar,
+        email,
+        hash,
+      }))
     .then((user) => {
       res
         .status(201)
         .send({ name: user.name, avatar: user.avatar, email: user.email });
-      console.log({ user });
-      console.log(user.password);
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log({ name: err.name });
       if (err.message === "Email already exists!") {
         return res.status(DUPLICATE_ERROR).send({ message: err.message });
       }
@@ -59,12 +53,11 @@ const login = (req, res) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
-      res.status(200).send({
+      res.send({
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
       });
     })
-    .catch((err) => {
-      console.error(err);
+    .catch(() => {
       res
         .status(INVALID_AUTHENTICATION)
         .send({ message: "Invalid Credentials!" });
@@ -72,52 +65,40 @@ const login = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const currentUser = req.user;
-  User.find({ currentUser })
+  const currentUser = req.user._id;
+  User.findById(currentUser)
     .orFail(() => {
       const error = new Error("User ID not found");
       error.statusCode = NO_DATA_WITH_ID_ERROR;
       throw error;
     })
-    .then((result) => {
+    .then((result) => res.status(200).send({ data: result }))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res
+          .status(INVALID_DATA_ERROR)
+          .send({ message: "Invalid data!" });
+      }
+      if (err.message === "User ID not found") {
+        return res.status(NO_DATA_WITH_ID_ERROR).send({ message: err.message });
+      }
       return res
-        .status(200)
-        .send({ data: result })
-        .catch((err) => {
-          console.log(err);
-          console.log(err.message);
-          console.log(err.name);
-          if (err.name === "CastError") {
-            return res
-              .status(INVALID_DATA_ERROR)
-              .send({ message: "Invalid data!" });
-          }
-          if (err.message === "User ID not found") {
-            return res
-              .status(NO_DATA_WITH_ID_ERROR)
-              .send({ message: err.message });
-          }
-          return res
-            .status(INTERNAL_SERVER_ERROR)
-            .send({ message: "An error occured on the server!" });
-        });
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error occured on the server!" });
     });
 };
 
 const updateProfile = (req, res) => {
-  const opts = { runValidators: true };
+  const opts = { new: true, runValidators: true };
   User.findOneAndUpdate(
     { _id: req.user._id },
-    { name: req.user.name, avatar: req.user.avatar },
-    { new: true, opts }
+    { name: req.body.name, avatar: req.body.avatar },
+    { opts }
   )
     .then((result) => {
       res.status(200).send({ result });
     })
     .catch((err) => {
-      console.log(err);
-      console.log(err.message);
-      console.log(err.name);
       if (err.name === "ValidationError") {
         return res
           .status(INVALID_DATA_ERROR)
