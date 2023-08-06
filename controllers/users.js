@@ -23,12 +23,14 @@ const createUser = (req, res) => {
       }
       return bcrypt.hash(password, 10);
     })
-    .then((hash) => User.create({
+    .then((hash) =>
+      User.create({
         name,
         avatar,
         email,
-        hash,
-      }))
+        password: hash,
+      })
+    )
     .then((user) => {
       res
         .status(201)
@@ -93,7 +95,7 @@ const updateProfile = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { name: req.body.name, avatar: req.body.avatar },
-    { opts }
+    opts
   )
     .then((result) => {
       res.status(200).send({ result });
