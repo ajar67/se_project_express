@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/ajar67/se_project_express/issues"
   },
-  "homepage": "https://github.com/ajar67/se_project_express#readme",
+  "homepage": "https://github.com/ajar67/se_project_express",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
