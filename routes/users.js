@@ -5,7 +5,7 @@ const router = express.Router();
 
 const { getCurrentUser, updateProfile } = require("../controllers/users");
 
-router.get("users/me", authorize, getCurrentUser);
-router.patch("users/me", authorize, updateProfile);
+router.get("/me", authorize, getCurrentUser);
+router.patch("/me", authorize, updateProfile);
 
 module.exports = router;
