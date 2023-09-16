@@ -35,7 +35,7 @@ const createUser = (req, res) => {
       res
         .status(201)
         .send({ name: user.name, avatar: user.avatar, email: user.email });
-      
+
     })
     .catch((err) => {
       console.error(err);
