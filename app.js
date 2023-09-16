@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const usersRoutes = require("./routes/users");
 const itemsRoutes = require("./routes/clothingItems");
 const {
@@ -12,6 +13,7 @@ const { login, createUser } = require("./controllers/users");
 
 const { PORT = 3001 } = process.env;
 const server = express();
+server.use(cookieParser());
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 server.use(express.json());
 server.use(cors());

@@ -35,8 +35,10 @@ const createUser = (req, res) => {
       res
         .status(201)
         .send({ name: user.name, avatar: user.avatar, email: user.email });
+      
     })
     .catch((err) => {
+      console.error(err);
       if (err.message === "Email already exists!") {
         return res.status(DUPLICATE_ERROR).send({ message: err.message });
       }
@@ -59,7 +61,8 @@ const login = (req, res) => {
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
       });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error(err, err.name);
       res
         .status(INVALID_AUTHENTICATION)
         .send({ message: "Invalid Credentials!" });
@@ -76,6 +79,7 @@ const getCurrentUser = (req, res) => {
     })
     .then((result) => res.status(200).send({ data: result }))
     .catch((err) => {
+      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(INVALID_DATA_ERROR)
@@ -101,6 +105,7 @@ const updateProfile = (req, res) => {
       res.status(200).send({ result });
     })
     .catch((err) => {
+      console.error(err);
       if (err.name === "ValidationError") {
         return res
           .status(INVALID_DATA_ERROR)
