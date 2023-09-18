@@ -19,7 +19,9 @@ const getItems = (req, res) => {
 };
 
 const createItem = (req, res) => {
+  console.log(req.body);
   const { name, weather, imageUrl } = req.body;
+  console.log({name, weather, imageUrl});
 
   clothingItem
     .create({ name, weather, imageUrl, owner: req.user._id })
@@ -27,6 +29,7 @@ const createItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
+      console.error('createItem: ', err);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
