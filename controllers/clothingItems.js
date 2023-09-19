@@ -13,15 +13,17 @@ const getItems = (req, res) => {
     .then((items) => {
       res.status(200).send({ data: items });
     })
-    .catch(() => res
+    .catch(() =>
+      res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occured on the server!" }));
+        .send({ message: "An error occured on the server!" })
+    );
 };
 
 const createItem = (req, res) => {
   console.log(req.body);
   const { name, weather, imageUrl } = req.body;
-  console.log({name, weather, imageUrl});
+  console.log({ name, weather, imageUrl });
 
   clothingItem
     .create({ name, weather, imageUrl, owner: req.user._id })
@@ -29,7 +31,7 @@ const createItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
-      console.error('createItem: ', err);
+      console.error("createItem: ", err);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
@@ -64,6 +66,7 @@ const deleteItem = (req, res) => {
         .then(() => res.status(200).send({ message: "Item was deleted!" }));
     })
     .catch((err) => {
+      console.error("deleteItem: ", err, err.name);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
@@ -79,6 +82,8 @@ const deleteItem = (req, res) => {
 };
 
 const likeItem = (req, res) => {
+  console.log(req.params.item._id);
+  console.log(req.params.itemId);
   const { itemId } = req.params;
   clothingItem
     .findByIdAndUpdate(
@@ -95,6 +100,7 @@ const likeItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
+      console.error("likeItem: ", err, err.name);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
@@ -111,6 +117,9 @@ const likeItem = (req, res) => {
 
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
+  console.log(req.params.item._id);
+  console.log(req.params.itemId);
+  console.log(itemId);
   clothingItem
     .findByIdAndUpdate(
       itemId,
@@ -126,6 +135,7 @@ const dislikeItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
+      console.error("dislikeItem: ", err, err.name);
       if (err.name === "CastError") {
         return res.status(INVALID_DATA_ERROR).send({ message: "Invalid Id!" });
       }
