@@ -117,13 +117,13 @@ const likeItem = (req, res) => {
 
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
-  console.log(req.params.item._id);
+  console.log(req.params);
   console.log(req.params.itemId);
   console.log(itemId);
   clothingItem
     .findByIdAndUpdate(
       itemId,
-      { $pull: { likes: req.user._id } },
+      { $pull: { likes: req.params.itemId } },
       { new: true }
     )
     .orFail(() => {
