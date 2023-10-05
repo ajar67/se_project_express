@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cookieParser = require("cookie-parser");
 const usersRoutes = require("./routes/users");
 const itemsRoutes = require("./routes/clothingItems");
@@ -18,9 +20,12 @@ server.use(cookieParser());
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 server.use(express.json());
 server.use(cors());
+server.use(requestLogger);
 
 server.use("/users", usersRoutes);
 server.use("/items", itemsRoutes);
+
+server.use(errorLogger);
 
 server.post("/signin", login);
 server.post("/signup", createUser);
@@ -34,6 +39,8 @@ server.use((req, res) => {
 server.use((err, req, res) => {
   res.status(INTERNAL_SERVER_ERROR).send({ message: err });
 });
+
+server.use(errors());
 
 server.use(errorHandler);
 
