@@ -6,7 +6,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const cookieParser = require("cookie-parser");
 const usersRoutes = require("./routes/users");
 const itemsRoutes = require("./routes/clothingItems");
-const errorHandler = require("./middlewares/error-handler");
+const { errorHandler } = require("./middlewares/error-handler");
 const {
   INTERNAL_SERVER_ERROR,
   NO_DATA_WITH_ID_ERROR,
