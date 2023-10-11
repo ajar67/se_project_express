@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { errors } = require('celebrate');
-const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { errors } = require("celebrate");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 const cookieParser = require("cookie-parser");
 const usersRoutes = require("./routes/users");
 const itemsRoutes = require("./routes/clothingItems");
@@ -26,6 +26,12 @@ server.use("/users", usersRoutes);
 server.use("/items", itemsRoutes);
 
 server.use(errorLogger);
+
+server.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
 
 server.post("/signin", login);
 server.post("/signup", createUser);
