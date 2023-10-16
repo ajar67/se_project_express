@@ -2,15 +2,16 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { errors } = require("celebrate");
-const { requestLogger, errorLogger } = require("./middlewares/logger");
 const cookieParser = require("cookie-parser");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 const usersRoutes = require("./routes/users");
 const itemsRoutes = require("./routes/clothingItems");
 const { errorHandler } = require("./middlewares/error-handler");
+const { NotFoundError } = require("./utils/errors");
 const {
-  INTERNAL_SERVER_ERROR,
-  NO_DATA_WITH_ID_ERROR,
-} = require("./utils/errors");
+  createUserValidation,
+  createLoginAuthenticationValidation,
+} = require("./middlewares/validation");
 
 const { login, createUser } = require("./controllers/users");
 
@@ -24,6 +25,8 @@ server.use(requestLogger);
 
 server.use("/users", usersRoutes);
 server.use("/items", itemsRoutes);
+server.post("/signin", createLoginAuthenticationValidation, login);
+server.post("/signup", createUserValidation, createUser);
 
 server.use(errorLogger);
 
@@ -33,21 +36,11 @@ server.get("/crash-test", () => {
   }, 0);
 });
 
-server.post("/signin", login);
-server.post("/signup", createUser);
-
-server.use((req, res) => {
-  res
-    .status(NO_DATA_WITH_ID_ERROR)
-    .send({ message: `Route ${req.url} not found!` });
-});
-
-server.use((err, req, res) => {
-  res.status(INTERNAL_SERVER_ERROR).send({ message: err });
+server.use((req, next) => {
+  next(new NotFoundError(`Route ${req.url} not found!`));
 });
 
 server.use(errors());
-
 server.use(errorHandler);
 
 server.listen(PORT, () => {});
