@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 require("dotenv").config();
 
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET  || 'dhsgsbrjhufnkwefb4buguiueirgrgkgkfjndffnfbhewwygurgfdhrghfv';
 
 const {
   NO_DATA_WITH_ID_ERROR,

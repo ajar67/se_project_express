@@ -28,18 +28,16 @@ server.use("/items", itemsRoutes);
 server.post("/signin", createLoginAuthenticationValidation, login);
 server.post("/signup", createUserValidation, createUser);
 
-server.use(errorLogger);
-
 server.get("/crash-test", () => {
   setTimeout(() => {
     throw new Error("Server will crash now");
   }, 0);
 });
 
-server.use((req, next) => {
+server.use((req, res, next) => {
   next(new NotFoundError(`Route ${req.url} not found!`));
 });
-
+server.use(errorLogger);
 server.use(errors());
 server.use(errorHandler);
 
