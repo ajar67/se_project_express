@@ -12,7 +12,7 @@ Project's Name:
 What To Wear ... se_project_express
 
 Domain Name:
-https://api.what-to-wear.chickenkiller.com
+https://what-to-wear.chickenkiller.com
 
 Description:
 This is the back-end part of my project to the "What To Wear" browser. This takes care of api requests and how to take care of different types of errors and how to display them. How to account for each one and display that for the user. Also, it takes care of how to find "cards" (in this matter) by id and either update, remove, or even posting it to the server.
