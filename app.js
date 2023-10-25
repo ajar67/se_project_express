@@ -15,7 +15,7 @@ const {
 
 const { login, createUser } = require("./controllers/users");
 
-const { PORT = 443 } = process.env;
+const { PORT = 3001cd ../ } = process.env;
 const server = express();
 server.use(cookieParser());
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
