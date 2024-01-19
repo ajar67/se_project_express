@@ -23,3 +23,6 @@ https://what-to-wear.chickenkiller.com
 
 ## Technologies 
 I used express for my backend, including many libraries to fulfil the production of my app.
+
+## Demo
+https://www.loom.com/share/2b0b4dc79fd440db9e463c4181b023d8?sid=7aace9f2-6678-4b49-9558-b602eb7403e9
